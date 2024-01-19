@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from main import generate_design
+from api.main import generate_design
 from PIL import Image
 
 app = Flask(__name__)
