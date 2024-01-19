@@ -115,7 +115,7 @@ def mask_image(base_image, overlay_pattern, line_spacing):
     # Gather the gray ranges in each row and draw the curves
     for y in range(0, base_image.size[1], y_segment_width):
         print(f"Drawing curves for row {y}")
-        print("Current delta: ", datetime.now() - previous_time)
+        print("Current delta: ", datetime.now() - start_time)
         previous_time = datetime.now()
 
         gray_ranges = []
