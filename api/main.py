@@ -95,6 +95,9 @@ def mask_image(base_image, overlay_pattern, line_spacing):
     x_segment_min_width = 10
     displacement = line_spacing
     # Overlay the pattern on the original image
+    start_time = datetime.now()
+    previous_time = start_time
+    print("delta time in mask: ", datetime.now() - previous_time)
     for y in range(0, base_image.size[1], y_segment_width):
         for x in range(0, base_image.size[0], x_segment_min_width):
             if overlay_pattern.getpixel((x, y)) == (255, 255, 255):
@@ -105,12 +108,16 @@ def mask_image(base_image, overlay_pattern, line_spacing):
 
     # new_image.save(join('data', 'masked_image.png'))
     print(f"Masked image")
-
+    print("Current time after mask: ", datetime.now() - start_time)
 
     min_x, max_x = find_max_min_x(new_image)
     min_x_offset, max_x_offset = min_x - 150, max_x + 150
     # Gather the gray ranges in each row and draw the curves
     for y in range(0, base_image.size[1], y_segment_width):
+        print(f"Drawing curves for row {y}")
+        print("Current delta: ", datetime.now() - previous_time)
+        previous_time = datetime.now()
+
         gray_ranges = []
         in_gray_range = False
 
@@ -133,10 +140,10 @@ def mask_image(base_image, overlay_pattern, line_spacing):
         # Handle case where the last pixel in the row is gray
         if in_gray_range:
             gray_ranges[-1][1] = base_image.size[0]
-                    
 
         # Draw the curves
         if len(gray_ranges) > 1:
+            
             for idx, i in enumerate(gray_ranges):
                 # Wait until we are at most 70 pixels from a white segment, or the midpoint of the range
                 x_start = i[1] - 70
@@ -215,7 +222,9 @@ def mask_image(base_image, overlay_pattern, line_spacing):
                     control_y = min(curve_y_start, curve_y_end) + (abs(curve_y_start - curve_y_end))
 
                     draw_quadratic_curve(new_image, (curve_x_start, curve_y_start), (curve_x_end, curve_y_end), (control_x, control_y))
+                    
     print(f"Curves drawn")
+    print(f"total_time: {datetime.now() - start_time}")
     return new_image
 
 
@@ -223,7 +232,8 @@ def generate_design(input_image, line_spacing, line_width, background_color):
     # Load the original image
 
     # Add the background color to the original image
-    
+    start_time = datetime.now()
+    print("starting to generate design, time: ", datetime.now())
     min_y, max_y = find_max_min_y(input_image)
     # Create the white lines pattern
     white_lines_pattern, line_spacing = create_white_lines_pattern(input_image.width, input_image.height, line_spacing, line_width, min_y, max_y)
@@ -236,6 +246,7 @@ def generate_design(input_image, line_spacing, line_width, background_color):
     # Paste the original image onto the background image
     background_image.paste(final_image, (0, 0), final_image)
     # background_image.save(join('data', 'final_image.png'))
+    print("total time: ", datetime.now() - start_time)
 
     return background_image
 
