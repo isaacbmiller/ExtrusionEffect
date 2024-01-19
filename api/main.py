@@ -162,9 +162,6 @@ def mask_image(base_image, overlay_pattern, line_spacing):
                 if i[1] - i[0] > 140 and idx not in [0, len(gray_ranges) - 1]:
                     curve_x_end = i[0] + 70
                     need_flat = True
-
-                slope = (curve_y_end - curve_y_start) / (curve_x_end - curve_x_start)
-
                 
                 if i == gray_ranges[0]:
                     def opacity(x):
@@ -179,7 +176,8 @@ def mask_image(base_image, overlay_pattern, line_spacing):
                         extra_y_offset = scaled_displacement
                         for y_offset in range(y_segment_width):
                             new_y = y + y_offset + extra_y_offset
-                            if new_y < base_image.size[1]  and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
+                            if new_y < base_image.size[1]:
+                            # and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
                                 new_image.putpixel((x,new_y), (255, 255, 255, opacity(x)))
 
                     
@@ -193,29 +191,24 @@ def mask_image(base_image, overlay_pattern, line_spacing):
                     for x in range(curve_x_end, x_start):
                         for y_offset in range(y_segment_width):
                             new_y = y + y_offset + scaled_displacement
-                            if new_y < base_image.size[1] and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
+                            if new_y < base_image.size[1]:
+                            # and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
                                 new_image.putpixel((x, new_y), (255, 255, 255, 150))
                 
                 curve_x_start, curve_y_start = x_start, y + scaled_displacement
                 curve_x_end, curve_y_end = i[1], y
 
-                slope = (curve_y_end - curve_y_start) / (curve_x_end - curve_x_start)
-
-                if i == gray_ranges[-1]:
-                    slope == 0
-
                 # Define control point for the curve. Modify as needed.
                 if i == gray_ranges[-1]:
                     def opacity(x):
                         if x >= max_x_offset:
-                            # between max_x_offset and curve_x_end, opacity scales quadratically from 30 to 0
                             return int(30 - 30 * (x - max_x_offset) / (curve_x_end - max_x_offset))
-                        # between curve_x_start and max_x_offset, opacity scales linearly from 150 to 30
                         return int(30 + 120 * (max_x_offset - x) / (max_x_offset - curve_x_start))
                     for x in range(curve_x_start, curve_x_end):
                         for y_offset in range(y_segment_width):
                             new_y = y + y_offset + scaled_displacement
-                            if new_y < base_image.size[1] and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
+                            if new_y < base_image.size[1]:
+                            # and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
                                 new_image.putpixel((x, new_y), (255, 255, 255, opacity(x)))
                 else:
                     control_x = (curve_x_start + curve_x_end) // 2
