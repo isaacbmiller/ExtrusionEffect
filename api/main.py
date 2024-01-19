@@ -173,14 +173,11 @@ def mask_image(base_image, overlay_pattern, line_spacing):
                         return int(30 + 120 * (x - min_x_offset) / (curve_x_end - min_x_offset))
                     for x in range(i[0], curve_x_end):
                         # Draw solid gray pixels
-                        extra_y_offset = scaled_displacement
-                        for y_offset in range(y_segment_width):
-                            new_y = y + y_offset + extra_y_offset
-                            if new_y < base_image.size[1]:
-                            # and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
+                        if y + scaled_displacement + y_segment_width < base_image.size[1]:
+                            new_y = y + scaled_displacement
+                            for y_offset in range(y_segment_width):
                                 new_image.putpixel((x,new_y), (255, 255, 255, opacity(x)))
-
-                    
+                                new_y += 1
                 else:
                     control_x = (curve_x_start + curve_x_end) // 2
                     control_y = min(curve_y_start, curve_y_end) + (abs(curve_y_start - curve_y_end))
@@ -205,11 +202,13 @@ def mask_image(base_image, overlay_pattern, line_spacing):
                             return int(30 - 30 * (x - max_x_offset) / (curve_x_end - max_x_offset))
                         return int(30 + 120 * (max_x_offset - x) / (max_x_offset - curve_x_start))
                     for x in range(curve_x_start, curve_x_end):
-                        for y_offset in range(y_segment_width):
-                            new_y = y + y_offset + scaled_displacement
-                            if new_y < base_image.size[1]:
-                            # and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
+                        if y + scaled_displacement + y_segment_width < base_image.size[1]:
+                            new_y = y + scaled_displacement
+                            for _ in range(y_segment_width):
                                 new_image.putpixel((x, new_y), (255, 255, 255, opacity(x)))
+                                new_y += 1
+                                # if new_y < base_image.size[1]:
+                                # and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
                 else:
                     control_x = (curve_x_start + curve_x_end) // 2
                     control_y = min(curve_y_start, curve_y_end) + (abs(curve_y_start - curve_y_end))
