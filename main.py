@@ -10,8 +10,6 @@ def create_white_lines_pattern(image_width, image_height, line_spacing, line_wid
     draw = ImageDraw.Draw(pattern_image)
 
     # find max and min white pixels
-    # divive the range by num_lines, accounting for line_width and line_spacing
-
     # max_y - min_y = 17 * (line_width*2 + line_spacing)
 
     line_spacing = int((max_y - min_y) / num_lines - line_width*2)
@@ -29,9 +27,7 @@ def create_white_lines_pattern(image_width, image_height, line_spacing, line_wid
     while y < max_y:
         draw.line((0, y, image_width, y), fill='white', width=line_width)
         y += line_spacing + line_width*2
-    # for i in range(num_lines):
-    #     y = line_locations[i]
-    #     draw.line((0, y, image_width, y), fill='white', width=line_widths[i])
+    
 
     pattern_image.save("./images/results/white_lines_pattern.png")
 
@@ -49,6 +45,20 @@ def find_max_min_y(image):
                     max_y = y
     return min_y, max_y
 
+# find_max_min_x_cache = {}
+def find_max_min_x(image):
+    # if image in find_max_min_x_cache:
+    #     return find_max_min_x_cache[image]
+    min_x = image.size[0]
+    max_x = 0
+    for y in range(image.size[1]):
+        for x in range(image.size[0]):
+            if image.getpixel((x, y)) == (255, 255, 255, 255):
+                min_x = min(x, min_x)
+                max_x = max(x, max_x)
+    # find_max_min_x_cache[image] = (min_x, max_x)
+    return min_x, max_x
+
 def draw_quadratic_curve(image, start_point, end_point, control_point):
     for t in range(101):  # Iterate over t from 0 to 1 in steps of 0.01
         t /= 100
@@ -56,11 +66,22 @@ def draw_quadratic_curve(image, start_point, end_point, control_point):
         y = (1-t)**2 * start_point[1] + 2*(1-t)*t * control_point[1] + t**2 * end_point[1]
 
         x, y = int(x), int(y)  # Converting to integer for pixel coordinates
+
+        y_opacity_min = 150
+        y_opacity_max = 255
+
+        def opacity(y):
+            if end_point[1] - start_point[1] == 0:
+                return 0
+            if end_point[1] < start_point[1]:
+                return int(y_opacity_min + (y_opacity_max - y_opacity_min) * (y - start_point[1]) / (end_point[1] - start_point[1])) - 1
+            return int(y_opacity_min + (y_opacity_max - y_opacity_min) * (end_point[1] - y) / (end_point[1] - start_point[1])) - 1
+
         if y < image.size[1]:
             for y_offset in range(10): # TODO: Make this a variable - y_segment_width
                 new_y = y + y_offset
                 if new_y < image.size[1] and x < image.size[0] and x >= 0 and image.getpixel((x, new_y)) != (255, 255, 255, 255):
-                    image.putpixel((x, new_y), (255, 255, 255, 123))
+                    image.putpixel((x, new_y), (255, 255, 255, opacity(y)))
 
 def mask_image(base_image, overlay_pattern, line_spacing):
     # Ensure both images have the same size
@@ -81,6 +102,8 @@ def mask_image(base_image, overlay_pattern, line_spacing):
 
     new_image.save("./images/results/masked_image.png")
 
+    min_x, max_x = find_max_min_x(new_image)
+    min_x_offset, max_x_offset = min_x - 150, max_x + 150
     # Gather the gray ranges in each row and draw the curves
     for y in range(0, base_image.size[1], y_segment_width):
         gray_ranges = []
@@ -130,30 +153,36 @@ def mask_image(base_image, overlay_pattern, line_spacing):
 
                 slope = (curve_y_end - curve_y_start) / (curve_x_end - curve_x_start)
 
-
+                
                 if i == gray_ranges[0]:
+                    def opacity(x):
+                        if x <= min_x_offset:
+                            # between curve_x_start and min_x_offset, opacity scales linearly from 0 to 30
+                            return int(30 * (x - curve_x_start) / (min_x_offset - curve_x_start))
+                        # between min_x_offset and i[1], opacity scales linearly from 30 to 150
+
+                        return int(30 + 120 * (x - min_x_offset) / (curve_x_end - min_x_offset))
                     for x in range(i[0], curve_x_end):
                         # Draw solid gray pixels
-                        # extra_y_offset = int((x - curve_x_start) * slope)
-                        if i == gray_ranges[0]:
-                            extra_y_offset = scaled_displacement
+                        extra_y_offset = scaled_displacement
                         for y_offset in range(y_segment_width):
                             new_y = y + y_offset + extra_y_offset
                             if new_y < base_image.size[1]  and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
-                                new_image.putpixel((x,new_y), (255, 255, 255, 123))
+                                new_image.putpixel((x,new_y), (255, 255, 255, opacity(x)))
 
-                control_x = (curve_x_start + curve_x_end) // 2
-                control_y = min(curve_y_start, curve_y_end) + (abs(curve_y_start - curve_y_end))
+                    
+                else:
+                    control_x = (curve_x_start + curve_x_end) // 2
+                    control_y = min(curve_y_start, curve_y_end) + (abs(curve_y_start - curve_y_end))
 
-                draw_quadratic_curve(new_image, (curve_x_start, curve_y_start), (curve_x_end, curve_y_end), (control_x, control_y))
-                
+                    draw_quadratic_curve(new_image, (curve_x_start, curve_y_start), (curve_x_end, curve_y_end), (control_x, control_y))
                 
                 if need_flat:
                     for x in range(curve_x_end, x_start):
                         for y_offset in range(y_segment_width):
                             new_y = y + y_offset + scaled_displacement
                             if new_y < base_image.size[1] and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
-                                new_image.putpixel((x, new_y), (255, 255, 255, 123))
+                                new_image.putpixel((x, new_y), (255, 255, 255, 150))
                 
                 curve_x_start, curve_y_start = x_start, y + scaled_displacement
                 curve_x_end, curve_y_end = i[1], y
@@ -162,22 +191,20 @@ def mask_image(base_image, overlay_pattern, line_spacing):
 
                 if i == gray_ranges[-1]:
                     slope == 0
-                # Draw quadratic curve
-                # for x in range(curve_x_start, curve_x_end):
-                #     extra_y_offset = int((x - curve_x_start) * slope)
-                #     if i == gray_ranges[-1]:
-                #         extra_y_offset = 0
-                #     for y_offset in range(y_segment_width):
-                #         new_y = y + y_offset + extra_y_offset + scaled_displacement
-                #         if new_y < base_image.size[1] and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
-                #             new_image.putpixel((x, new_y), (255, 255, 255, 123))
+
                 # Define control point for the curve. Modify as needed.
                 if i == gray_ranges[-1]:
+                    def opacity(x):
+                        if x >= max_x_offset:
+                            # between max_x_offset and curve_x_end, opacity scales quadratically from 30 to 0
+                            return int(30 - 30 * (x - max_x_offset) / (curve_x_end - max_x_offset))
+                        # between curve_x_start and max_x_offset, opacity scales linearly from 150 to 30
+                        return int(30 + 120 * (max_x_offset - x) / (max_x_offset - curve_x_start))
                     for x in range(curve_x_start, curve_x_end):
                         for y_offset in range(y_segment_width):
                             new_y = y + y_offset + scaled_displacement
                             if new_y < base_image.size[1] and new_image.getpixel((x, new_y)) != (255, 255, 255, 255):
-                                new_image.putpixel((x, new_y), (255, 255, 255, 123))
+                                new_image.putpixel((x, new_y), (255, 255, 255, opacity(x)))
                 else:
                     control_x = (curve_x_start + curve_x_end) // 2
                     control_y = min(curve_y_start, curve_y_end) + (abs(curve_y_start - curve_y_end))
@@ -187,41 +214,34 @@ def mask_image(base_image, overlay_pattern, line_spacing):
     return new_image
 
 
-def generate_design(input_path, output_path, line_spacing, line_width, background_color=(255, 0, 0)):
+def generate_design(input_image, line_spacing, line_width, background_color):
     # Load the original image
-    original_image = Image.open(input_path)
 
     # Add the background color to the original image
-    # original_image = original_image.convert('RGBA') 
-
     
-
-    # original_image = background_image
-    # original_image = Image.alpha_composite(Image.new('RGBA', original_image.size, background_color), original_image)
-    
-    min_y, max_y = find_max_min_y(original_image)
+    min_y, max_y = find_max_min_y(input_image)
     # Create the white lines pattern
-    white_lines_pattern, line_spacing = create_white_lines_pattern(original_image.width, original_image.height, line_spacing, line_width, min_y, max_y)
+    white_lines_pattern, line_spacing = create_white_lines_pattern(input_image.width, input_image.height, line_spacing, line_width, min_y, max_y)
     
     # Overlay the pattern onto the original image
-    final_image = mask_image(original_image, white_lines_pattern, line_spacing)
+    final_image = mask_image(input_image, white_lines_pattern, line_spacing)
 
-    # Example usage:
-    forward_search_range = 20  # Horizontal distance to search forward
-
-    background_image = Image.new('RGBA', original_image.size, (36,105,126))
+    background_image = Image.new('RGBA', input_image.size, background_color)
 
     # Paste the original image onto the background image
-    # Since the original image is 'RGBA', the alpha channel will be used to blend it onto the background
     background_image.paste(final_image, (0, 0), final_image)
 
-    # background_image.save("./images/results/background_image.png")
+    return background_image
+
+def generate_local_design(input_path, output_path, line_spacing, line_width, background_color=(0, 0, 0)):
+    # Load the original image
+    image = Image.open(input_path)
+
+    image = generate_design(image, line_spacing, line_width, background_color)
 
     # Save the styled image
-    background_image.save(output_path)
+    image.save(output_path)
 
-# TODO: Automatically determine based off of number of lines desired and image size
-    
 # num lines = 17
 line_spacing = 60  # Spacing between lines, adjust as needed
 line_width = 10  # Width of the lines
@@ -239,15 +259,30 @@ def test_harness():
     for filename in os.listdir("./images/test_cases"):
         if "desired" in filename:
             continue
+        # look for only PNG
+        if ".png" not in filename:
+            continue
+
+
+        
+        background_color = (255, 255, 255)
+        if "pen" in filename:
+            background_color = (61, 122, 86, 255)
+        elif "bolt" in filename:
+            background_color = (103, 83, 145, 255)
+        elif "sketch" in filename:
+            background_color = (188, 91, 42, 255)
+
         input_filename = f"./images/test_cases/{filename}"
         output_filename = f"./images/results/{''.join(filename.split('.')[:-1])}_current.png"
         desired_filename = f"./images/test_cases/{''.join(filename.split('.')[:-1])}_desired.png"
         grid_files.append([output_filename, desired_filename])
-        generate_design(input_filename, output_filename, line_spacing, line_width)
+        generate_local_design(input_filename, output_filename, line_spacing, line_width, background_color=background_color)
 
     # Create an archive in /tests/{timestamp}
     os.mkdir(f"./tests/{timestamp}")
 
+    
     # Save the combined image to /tests/{timestamp}/combined.png
     combined_image = Image.new('RGBA', (1000, len(grid_files) * 300))
     for i in range(len(grid_files)):
