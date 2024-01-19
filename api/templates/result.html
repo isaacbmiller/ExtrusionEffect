@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Processed Image</title>
+    <title>Extrusion Effect</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
@@ -38,7 +38,7 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="#">Image Processor</a>
+        <a class="navbar-brand" href="#">Extrusion Effect</a>
     </nav>
 
     <div class="container">
@@ -46,7 +46,7 @@
         <img src="data:image/png;base64,{{ image_data }}" alt="Processed Image">    
         
         <div class="mt-3">
-            <a href="data:image/png;base64,{{ image_data }}" download="processed_image.png" class="btn btn-primary">Download Image</a>
+            <a href="data:image/png;base64,{{ image_data }}" download="{{ file_name }}" class="btn btn-primary">Download Image</a>
             <a href="{{ url_for('index') }}" class="btn btn-secondary">Back</a>
         </div>
     </div>

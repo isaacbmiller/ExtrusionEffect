@@ -22,6 +22,7 @@ def process_image():
     if request.method == 'POST':
         file = request.files['image']
         background_color = request.form['background-color']
+        file_name = file.filename
         # convert the background color from hex to rgb
         background_color = background_color.lstrip('#')
         background_color = tuple(int(background_color[i:i+2], 16) for i in (0, 2, 4))
@@ -33,7 +34,7 @@ def process_image():
 
         processed_image = generate_design(image, line_spacing, line_width, background_color)
         processed_image_base64 = get_image_data(processed_image)
-        return render_template('result.html', image_data=processed_image_base64)
+        return render_template('result.html', image_data=processed_image_base64, file_name=file_name)
 
 if __name__ == '__main__':
     app.run(debug=True)
