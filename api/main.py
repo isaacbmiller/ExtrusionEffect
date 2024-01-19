@@ -221,6 +221,17 @@ def generate_design(input_image, line_spacing, line_width, background_color):
     # Add the background color to the original image
     start_time = datetime.now()
     print("starting to generate design, time: ", datetime.now())
+
+    # Resize the image to have max width/heigth of 1500
+    max_width = 1500
+    max_height = 1500
+    if input_image.width > max_width or input_image.height > max_height:
+        if input_image.width > input_image.height:
+            input_image = input_image.resize((max_width, int(max_width * input_image.height / input_image.width)))
+        else:
+            input_image = input_image.resize((int(max_height * input_image.width / input_image.height), max_height))
+        print("resized image, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
+
     min_y, max_y = find_max_min_y(input_image)
     print("min_y, max_y found, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
     # Create the white lines pattern

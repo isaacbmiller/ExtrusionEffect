@@ -2,20 +2,67 @@
 <html>
 <head>
     <title>Image Processor</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 5rem;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .color-picker {
+            width: 100%;
+            max-width: 150px; /* Constraint for color picker width */
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #f1f1f1;
+            color: black;
+        }
+        footer a {
+            color: black;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-    <div style="text-align: center;">
-        <h1>Image Processor</h1>
-        <h2>Upload an Image</h2>
-        <form action="/process" method="post" enctype="multipart/form-data">
-            <input type="file" name="image" required><br><br>
-            
-            <!-- Color Picker for Background Color -->
-            <label for="background-color">Choose a Background Color:</label><br>
-            <input type="color" id="background-color" name="background-color" value="#000000"><br><br>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="#">Image Processor</a>
+    </nav>
 
-            <input type="submit" value="Process Image">
+    <div class="container">
+        <h1>Upload an Image</h1>
+        <form action="/process" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" class="form-control-file" name="image" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="background-color">Choose a Background Color:</label>
+                <input type="color" class="form-control color-picker" id="background-color" name="background-color" value="#000000">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Process Image</button>
         </form>
     </div>
+
+    <footer>
+        <p>Made by <a href="https://twitter.com/isaacbmiller1" target="_blank" style="color: blue">Isaac Miller</a></p>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

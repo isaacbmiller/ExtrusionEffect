@@ -2,24 +2,62 @@
 <html>
 <head>
     <title>Processed Image</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 5rem;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        img {
+            max-width: 600px;
+            height: auto;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #f1f1f1;
+            color: black;
+        }
+        footer a {
+            color: black;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-    <div style="text-align: center;">
-        <h1>Image Processor</h1>
-    <h2>Processed Image</h2>
-    <img src="data:image/png;base64,{{ image_data }}" alt="Processed Image" style="width: 500px;">    
-    <!-- Add buttons to download-->
-    <br>
-    <a href="data:image/png;base64,{{ image_data }}" download="processed_image.png">Download Image</a>
-    <!-- <a href="data/processed_image" download="processed_image.png">
-        <button>Download</button>
-    </a> -->
-    <br>
-    <a href="{{ url_for('index') }}">
-        <button>Back</button>
-    </a>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="#">Image Processor</a>
+    </nav>
 
+    <div class="container">
+        <h1>Processed Image</h1>
+        <img src="data:image/png;base64,{{ image_data }}" alt="Processed Image">    
+        
+        <div class="mt-3">
+            <a href="data:image/png;base64,{{ image_data }}" download="processed_image.png" class="btn btn-primary">Download Image</a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Back</a>
+        </div>
     </div>
 
+    <footer>
+        <p>Made by <a href="https://twitter.com/isaacbmiller1" target="_blank" style="color: blue">Isaac Miller</a></p>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>
