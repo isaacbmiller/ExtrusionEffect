@@ -14,14 +14,6 @@ def create_white_lines_pattern(image_width, image_height, line_spacing, line_wid
     # max_y - min_y = 17 * (line_width*2 + line_spacing)
 
     line_spacing = int((max_y - min_y) / num_lines - line_width*2)
-    current_y = min_y
-    # line_widths = [12, 12, 12, 10, 10, 10, 10, 8, 8, 8, 8, 6, 6, 6, 4, 4, 4]
-
-    # line_locations = []
-    # for i in range(num_lines):
-    #     line_locations.append(current_y)
-    #     current_y += line_widths[i] + line_spacing
-    # print(current_y, max_y)
 
     # Draw white horizontal lines across the pattern image with the specified spacing
     y = min_y
@@ -227,6 +219,7 @@ def generate_design(input_image, line_spacing, line_width, background_color):
     start_time = datetime.now()
     print("starting to generate design, time: ", datetime.now())
     min_y, max_y = find_max_min_y(input_image)
+    print("min_y, max_y found, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
     # Create the white lines pattern
     white_lines_pattern, line_spacing = create_white_lines_pattern(input_image.width, input_image.height, line_spacing, line_width, min_y, max_y)
     print("white lines pattern created, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
