@@ -12,7 +12,6 @@ def index():
 def process_image():
     if request.method == 'POST':
         file = request.files['image']
-        # Process the image file using your script
 
         image = Image.open(file)
 

@@ -280,7 +280,7 @@ def test_harness():
         generate_local_design(input_filename, output_filename, line_spacing, line_width, background_color=background_color)
 
     # Create an archive in /tests/{timestamp}
-    os.mkdir(f"./tests/{timestamp}")
+    os.mkdir(f"./logs/{timestamp}")
 
     
     # Save the combined image to /tests/{timestamp}/combined.png
