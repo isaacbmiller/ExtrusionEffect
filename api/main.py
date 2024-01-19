@@ -29,7 +29,7 @@ def create_white_lines_pattern(image_width, image_height, line_spacing, line_wid
         y += line_spacing + line_width*2
     
 
-    pattern_image.save("./images/results/white_lines_pattern.png")
+    pattern_image.save("./api/static/white_lines_pattern.png")
 
     return pattern_image, line_spacing
 
@@ -100,7 +100,7 @@ def mask_image(base_image, overlay_pattern, line_spacing):
                         for y_offset in range(y_segment_width):
                             new_image.putpixel((x+x_offset, y + y_offset), (255, 255, 255, 255))
 
-    new_image.save("./images/results/masked_image.png")
+    new_image.save("./api/static/masked_image.png")
 
     min_x, max_x = find_max_min_x(new_image)
     min_x_offset, max_x_offset = min_x - 150, max_x + 150
