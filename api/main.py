@@ -34,10 +34,8 @@ def find_max_min_y(image):
     for y in range(image.size[1]):
         for x in range(image.size[0]):
             if image.getpixel((x, y)) == (255, 255, 255, 255):
-                if y < min_y:
-                    min_y = y
-                if y > max_y:
-                    max_y = y
+                min_y = min(y, min_y)
+                max_y = max(y, max_y)
     return min_y, max_y
 
 # find_max_min_x_cache = {}
