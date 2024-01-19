@@ -235,9 +235,10 @@ def generate_design(input_image, line_spacing, line_width, background_color):
     print("final image created, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
 
     background_image = Image.new('RGBA', input_image.size, background_color)
-
+    print("background image created, time: ", datetime.now() - start_time)
     # Paste the original image onto the background image
     background_image.paste(final_image, (0, 0), final_image)
+    print("final image pasted onto background image, time: ", datetime.now() - start_time)
     # background_image.save(join('data', 'final_image.png'))
     print("total time: ", datetime.now() - start_time)
 
