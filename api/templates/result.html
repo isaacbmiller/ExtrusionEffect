@@ -7,13 +7,14 @@
     <div style="text-align: center;">
         <h1>Image Processor</h1>
     <h2>Processed Image</h2>
-    <img src="{{ url_for('static', filename='processed_image.png') }}" alt="Processed Image" style="width: 500px;">
+    <img src="data:image/png;base64,{{ image_data }}" alt="Processed Image" style="width: 500px;">    
     <!-- Add buttons to download-->
     <br>
-    <a href="{{ url_for('static', filename='processed_image.png') }}" download="processed_image.png">
+    <a href="data:image/png;base64,{{ image_data }}" download="processed_image.png">Download Image</a>
+    <!-- <a href="data/processed_image" download="processed_image.png">
         <button>Download</button>
-    </a>
-
+    </a> -->
+    <br>
     <a href="{{ url_for('index') }}">
         <button>Back</button>
     </a>

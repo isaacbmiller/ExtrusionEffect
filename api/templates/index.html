@@ -4,10 +4,18 @@
     <title>Image Processor</title>
 </head>
 <body>
-    <h2>Upload an Image</h2>
-    <form action="/process" method="post" enctype="multipart/form-data">
-        <input type="file" name="image" required>
-        <input type="submit" value="Process Image">
-    </form>
+    <div style="text-align: center;">
+        <h1>Image Processor</h1>
+        <h2>Upload an Image</h2>
+        <form action="/process" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" required><br><br>
+            
+            <!-- Color Picker for Background Color -->
+            <label for="background-color">Choose a Background Color:</label><br>
+            <input type="color" id="background-color" name="background-color" value="#000000"><br><br>
+
+            <input type="submit" value="Process Image">
+        </form>
+    </div>
 </body>
 </html>
