@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw
 import os
 from os.path import join
 from datetime import datetime
+import numpy as np
 
 def create_white_lines_pattern(image_width, image_height, line_spacing, line_width, min_y, max_y, num_lines=17):
     # Create a new image with the same dimensions as the original
@@ -29,27 +30,31 @@ def create_white_lines_pattern(image_width, image_height, line_spacing, line_wid
     return pattern_image, line_spacing
 
 def find_max_min_y(image):
-    min_y = image.size[1]
-    max_y = 0
-    for y in range(image.size[1]):
-        for x in range(image.size[0]):
-            if image.getpixel((x, y)) == (255, 255, 255, 255):
-                min_y = min(y, min_y)
-                max_y = max(y, max_y)
+    # Convert PIL image to Numpy array
+    np_image = np.array(image)
+
+    # Find rows containing the target color
+    rows_with_white = np.any(np.all(np_image == [255, 255, 255, 255], axis=2), axis=1)
+
+    # Get min and max y indices
+    y_indices = np.where(rows_with_white)[0]
+    min_y = y_indices.min() if y_indices.size > 0 else 0
+    max_y = y_indices.max() if y_indices.size > 0 else image.size[1]
+
     return min_y, max_y
 
-# find_max_min_x_cache = {}
 def find_max_min_x(image):
-    # if image in find_max_min_x_cache:
-    #     return find_max_min_x_cache[image]
-    min_x = image.size[0]
-    max_x = 0
-    for y in range(image.size[1]):
-        for x in range(image.size[0]):
-            if image.getpixel((x, y)) == (255, 255, 255, 255):
-                min_x = min(x, min_x)
-                max_x = max(x, max_x)
-    # find_max_min_x_cache[image] = (min_x, max_x)
+    # Convert PIL image to Numpy array
+    np_image = np.array(image)
+
+    # Find columns containing the target color
+    cols_with_white = np.any(np.all(np_image == [255, 255, 255, 255], axis=2), axis=0)
+
+    # Get min and max x indices
+    x_indices = np.where(cols_with_white)[0]
+    min_x = x_indices.min() if x_indices.size > 0 else 0
+    max_x = x_indices.max() if x_indices.size > 0 else image.size[0]
+
     return min_x, max_x
 
 def draw_quadratic_curve(image, start_point, end_point, control_point):
