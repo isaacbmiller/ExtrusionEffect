@@ -237,9 +237,10 @@ def generate_design(input_image, line_spacing, line_width, background_color):
     min_y, max_y = find_max_min_y(input_image)
     # Create the white lines pattern
     white_lines_pattern, line_spacing = create_white_lines_pattern(input_image.width, input_image.height, line_spacing, line_width, min_y, max_y)
-    
+    print("white lines pattern created, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
     # Overlay the pattern onto the original image
     final_image = mask_image(input_image, white_lines_pattern, line_spacing)
+    print("final image created, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
 
     background_image = Image.new('RGBA', input_image.size, background_color)
 
