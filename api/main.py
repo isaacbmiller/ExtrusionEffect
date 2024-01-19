@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw
 import os
 from os.path import join
 from datetime import datetime
+import logging
 
 def create_white_lines_pattern(image_width, image_height, line_spacing, line_width, min_y, max_y, num_lines=17):
     # Create a new image with the same dimensions as the original
@@ -28,6 +29,8 @@ def create_white_lines_pattern(image_width, image_height, line_spacing, line_wid
     while y < max_y:
         draw.line((0, y, image_width, y), fill='white', width=line_width)
         y += line_spacing + line_width*2
+
+    logging.info(f"Line spacing: {line_spacing}")
     
 
     # pattern_image.save("./api/static/white_lines_pattern.png")
@@ -102,6 +105,8 @@ def mask_image(base_image, overlay_pattern, line_spacing):
                             new_image.putpixel((x+x_offset, y + y_offset), (255, 255, 255, 255))
 
     # new_image.save(join('data', 'masked_image.png'))
+    logging.info(f"Masked image")
+
 
     min_x, max_x = find_max_min_x(new_image)
     min_x_offset, max_x_offset = min_x - 150, max_x + 150
@@ -211,7 +216,7 @@ def mask_image(base_image, overlay_pattern, line_spacing):
                     control_y = min(curve_y_start, curve_y_end) + (abs(curve_y_start - curve_y_end))
 
                     draw_quadratic_curve(new_image, (curve_x_start, curve_y_start), (curve_x_end, curve_y_end), (control_x, control_y))
-
+    logging.info(f"Curves drawn")
     return new_image
 
 
