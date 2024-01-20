@@ -222,9 +222,15 @@ def generate_design(input_image, line_spacing, line_width, background_color):
     start_time = datetime.now()
     print("starting to generate design, time: ", datetime.now())
 
+    # Convert to RGBA if necessary
+    if input_image.mode != 'RGBA':
+        input_image = input_image.convert('RGBA')
+        print("converted to RGBA, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
+
     # Resize the image to have max width/heigth of 1500
-    max_width = 1500
-    max_height = 1500
+    max_width, max_height = 1500, 1500
+    min_width, min_height = 1000, 1000
+
     if input_image.width > max_width or input_image.height > max_height:
         if input_image.width > input_image.height:
             input_image = input_image.resize((max_width, int(max_width * input_image.height / input_image.width)))
@@ -232,8 +238,7 @@ def generate_design(input_image, line_spacing, line_width, background_color):
             input_image = input_image.resize((int(max_height * input_image.width / input_image.height), max_height))
         print("resized image, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
 
-    min_width, min_height = 1000, 1000
-    if input_image.width < min_width or input_image.height < min_height:
+    elif input_image.width < min_width or input_image.height < min_height:
         if input_image.width < input_image.height:
             input_image = input_image.resize((min_width, int(min_width * input_image.height / input_image.width)))
         else:
@@ -321,6 +326,5 @@ def test_harness():
     combined_image.save(f"./tests/{timestamp}/combined.png")
     combined_image.save(f"./images/results/combined.png")
     
-
 if __name__ == "__main__":
     test_harness()
