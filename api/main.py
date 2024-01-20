@@ -95,10 +95,10 @@ def mask_image(base_image, overlay_pattern, line_spacing):
     print("delta time in mask: ", datetime.now() - previous_time)
     for y in range(0, base_image.size[1], y_segment_width):
         for x in range(0, base_image.size[0], x_segment_min_width):
-            if overlay_pattern.getpixel((x, y)) == (255, 255, 255):
-                if base_image.getpixel((x, y)) == (255, 255, 255, 255):
-                    for x_offset in range(x_segment_min_width):
-                        for y_offset in range(y_segment_width):
+            if overlay_pattern.getpixel((x, y)) == (255, 255, 255) and base_image.getpixel((x, y)) == (255, 255, 255, 255):
+                for x_offset in range(x_segment_min_width):
+                    for y_offset in range(y_segment_width):
+                        if y + y_offset < base_image.size[1] and x + x_offset < base_image.size[0]:
                             new_image.putpixel((x+x_offset, y + y_offset), (255, 255, 255, 255))
 
     # new_image.save(join('data', 'masked_image.png'))
@@ -230,6 +230,14 @@ def generate_design(input_image, line_spacing, line_width, background_color):
             input_image = input_image.resize((max_width, int(max_width * input_image.height / input_image.width)))
         else:
             input_image = input_image.resize((int(max_height * input_image.width / input_image.height), max_height))
+        print("resized image, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
+
+    min_width, min_height = 1000, 1000
+    if input_image.width < min_width or input_image.height < min_height:
+        if input_image.width < input_image.height:
+            input_image = input_image.resize((min_width, int(min_width * input_image.height / input_image.width)))
+        else:
+            input_image = input_image.resize((int(min_height * input_image.width / input_image.height), min_height))
         print("resized image, time: ", datetime.now(), "delta time: ", datetime.now() - start_time)
 
     min_y, max_y = find_max_min_y(input_image)
